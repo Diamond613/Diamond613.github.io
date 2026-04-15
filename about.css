@@ -158,3 +158,42 @@ h1 {
 .container { padding-top: 40px; }
     h1 { letter-spacing: -2px; }
 }
+
+/* --- MODERN MOBILE UPDATE FOR ABOUT/HELP.CSS --- */
+@media (max-width: 600px) {
+    .container {
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-size: 38px;
+        letter-spacing: -1px;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr; /* One founder per row */
+    }
+
+    .team-card {
+        padding: 30px 20px;
+    }
+
+    .cta-box {
+        padding: 40px 24px;
+        border-radius: 24px;
+    }
+
+    /* Help Center Search Bar */
+    .search-bar {
+        font-size: 14px;
+        padding: 16px 20px;
+    }
+
+    .guide-section {
+        padding: 24px 20px;
+    }
+    
+    .guide-section h2 {
+        font-size: 20px;
+    }
+}

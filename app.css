@@ -859,46 +859,27 @@ canvas#spendingChart {
     max-height: 240px; /* Match your wrapper */
 }
 
-/* ── MOBILE RESPONSIVE (app.css) ── */
+/* --- MODERN MOBILE UPDATE FOR APP.CSS --- */
 @media (max-width: 900px) {
-  .main-grid { grid-template-columns: 1fr; }
-  .summary-grid { grid-template-columns: repeat(3, 1fr); }
-}
+    .dashboard-container {
+        grid-template-columns: 1fr; /* Single column stack */
+        padding: 20px;
+    }
 
-@media (max-width: 600px) {
-  .summary-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
-  header { padding: 0 12px; gap: 8px; }
-  .app { padding: 12px 10px; }
-  .month-label { display: none; }
-  .user-email { display: none; }
-  .user-chip { padding: 4px; border-radius: 50%; }
-  .logout-btn span { display: none; }
-  .panel-header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px 12px; }
-  .type-toggle { width: 100%; }
-  .type-btn { flex: 1; }
-  .form-body { padding: 14px 16px; }
-  .filter-bar {
-    padding: 10px 16px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .filter-bar::-webkit-scrollbar { display: none; }
-  .filter-chip { flex-shrink: 0; }
-  .tx-item { padding: 10px 16px; gap: 10px; }
-  .chart-wrap { height: 200px; padding: 14px 16px; }
-  .budget-section { padding: 16px; }
-  .summary-card { padding: 16px; }
-  .card-amount { font-size: 24px; }
-  .modal { padding: 20px 16px; }
-  .footer-content { flex-direction: column; text-align: center; }
-  .footer-right, .footer-links { text-align: center; justify-content: center; }
-}
+    .sidebar {
+        position: static; /* No longer floating on the side */
+        width: 100%;
+    }
 
-@media (max-width: 380px) {
-  .card-amount { font-size: 20px; }
-  header { height: auto; padding: 10px 12px; flex-wrap: wrap; }
-  .logo { font-size: 18px; }
+    .stats-grid {
+        grid-template-columns: 1fr; /* Big easy-to-read cards */
+    }
+
+    .main-card {
+        padding: 24px;
+    }
+
+    .chart-box {
+        height: 250px; /* Smaller height for mobile charts */
+    }
 }

@@ -526,62 +526,68 @@ nav {
   100% { opacity: 1; }
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 900px) {
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 40px 20px;
-  }
-  .footer-brand {
-    grid-column: span 2;
-    margin-bottom: 20px;
-  }
-}
+/* --- MODERN MOBILE UPDATE FOR INDEX.CSS --- */
+@media (max-width: 768px) {
+    nav {
+        padding: 0 20px;
+        height: 64px;
+    }
 
-@media (max-width: 500px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-  .footer-brand {
-    grid-column: span 1;
-  }
-  .footer-bottom {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-  }
-}
+    .nav-link { display: none; } /* Keeps it clean on small screens */
 
-.time{
-  color: #fa1010;
-}
+    .hero {
+        padding: 60px 20px 40px;
+        min-height: auto;
+    }
 
-/* ── MOBILE RESPONSIVE (index.css) ── */
-@media (max-width: 760px) {
-  nav { padding: 0 4%; height: 58px; }
-  .nav-link { display: none; }
-  .login-btn { padding: 8px 16px; font-size: 12px; }
-  .hero { padding: 60px 5% 50px; min-height: auto; }
-  .hero h1 { letter-spacing: -1px; }
-  .hero p { font-size: 15px; }
-  .cta-btn { padding: 13px 28px; font-size: 14px; }
-  .hero-stats { gap: 16px; margin-top: 36px; }
-  .stat-num { font-size: 18px; }
-  .stat-label { font-size: 10px; }
-  .features { padding: 40px 5% 60px; }
-  .features-grid { grid-template-columns: 1fr; gap: 12px; }
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px 16px; }
-  .footer-brand { grid-column: span 2; margin-bottom: 8px; }
-  .main-footer { padding: 50px 5% 28px; }
-}
+    .hero-badge {
+        font-size: 10px;
+        padding: 4px 12px;
+    }
 
-@media (max-width: 480px) {
-  .hero-stats { gap: 10px; }
-  .stat-num { font-size: 16px; }
-  .stat-divider { height: 30px; }
-  .footer-grid { grid-template-columns: 1fr; }
-  .footer-brand { grid-column: span 1; }
-  .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
-  .modal-content { padding: 28px 20px; }
-  .hero h1 { font-size: 34px; letter-spacing: -0.5px; }
+    .hero h1 {
+        font-size: 40px; /* Fluid scaling */
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+    }
+
+    .hero p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 30px;
+    }
+
+    .cta-btn {
+        width: 100%; /* Full width buttons are better for thumbs */
+        padding: 18px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .hero-stats {
+        flex-direction: row; /* Keep them side-by-side but smaller */
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .stat-num { font-size: 18px; }
+    .stat-label { font-size: 9px; }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr; /* Stack everything */
+        gap: 40px;
+        text-align: center;
+    }
+
+    .footer-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 }
