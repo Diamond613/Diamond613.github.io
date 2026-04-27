@@ -837,79 +837,66 @@ canvas#spendingChart {
     max-height: 240px; /* Match your wrapper */
 }
 
-
-/* ─── ULTIMATE MOBILE & 320px FIX ─── */
+/* --- MOBILE REPAIR: NO OVERLAP & PERFECT FIT --- */
 @media (max-width: 600px) {
-  /* 1. COMPLETELY REMOVE DATE FOR HEADER SPACE */
-  .month-label, #monthLabel {
-    display: none !important;
-  }
+    /* 1. Kill the April 2026 label to save header space */
+    #monthLabel, .month-label {
+        display: none !important;
+    }
 
-  /* 2. RECTANGULAR LOGOUT BUTTON */
-  .logout-btn {
-    padding: 6px 12px !important;
-    border-radius: 6px !important; /* Makes it a rectangle */
-    width: auto !important;
-    height: 34px !important;
-    font-size: 11px !important;
-    aspect-ratio: auto !important;
-  }
+    /* 2. Fix the Logout Button to a simple rectangle */
+    .logout-btn {
+        border-radius: 6px !important;
+        padding: 4px 10px !important;
+        height: 32px !important;
+        width: auto !important;
+        aspect-ratio: auto !important;
+    }
+    .logout-btn span { display: none !important; } /* Hide 'Logout' text if space is tight */
 
-  /* Hide logout text to ensure it fits on 320px */
-  .logout-btn span { 
-    display: none !important; 
-  }
+    /* 3. The Main Layout Fix */
+    .main-grid {
+        display: block !important; /* Switch from Grid/Flex to Block for safest stacking */
+        width: 100% !important;
+        padding: 0 !important;
+    }
 
-  /* 3. HEADER COMPACTNESS */
-  header {
-    padding: 0 10px !important;
-    height: 56px;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
+    /* 4. Prevent Overlapping */
+    .panel {
+        width: 100% !important;
+        margin-bottom: 20px !important; /* Creates physical space between them */
+        position: relative !important;  /* Stops absolute positioning overlaps */
+        display: block !important;
+        height: auto !important;        /* Let the content define the height */
+        float: none !important;
+    }
 
-  .logo {
-    font-size: 16px !important;
-    flex-shrink: 1;
-  }
+    /* 5. Fix internal form row squashing */
+    .form-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
 
-  /* 4. MOVE ADD TRANSACTION ON TOP */
-  .main-grid {
-    display: flex !important;
-    flex-direction: column !important; /* Stack vertically */
-    gap: 16px !important;
-  }
+    /* 6. Ensure the Chart doesn't burst out of the screen */
+    .chart-wrap {
+        height: 200px !important;
+        width: 100% !important;
+    }
 
-  /* This targets the "Add Transaction" panel specifically */
-  .panel:not(.history-panel):not(.chart-panel) {
-    order: 1 !important; /* Force to top */
-  }
+    canvas#spendingChart {
+        width: 100% !important;
+        height: 100% !important;
+    }
 
-  /* This targets the Transaction List */
-  .history-panel {
-    order: 2 !important; /* Force below form */
-    margin-top: 0 !important;
-  }
-
-  .chart-panel {
-    order: 3 !important; /* Chart at the very bottom */
-  }
-
-  /* 5. SUMMARY CARDS FIX */
-  .summary-grid {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  .user-email {
-    display: none !important;
-  }
-
-  .user-chip {
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-  }
+    /* 7. Header Compactness for 320px */
+    header {
+        padding: 0 8px !important;
+        height: 56px !important;
+    }
+    
+    .logo { font-size: 15px !important; }
+    .user-chip { background: transparent !important; border: none !important; }
 }
 
  /* Prevent horizontal overflow on the entire site */

@@ -155,6 +155,11 @@ function init() {
       updateChart();
     }
   }, 1000);
+
+  if (window.innerWidth <= 600) {
+    const monthLabel = document.getElementById("monthLabel");
+    if (monthLabel) monthLabel.style.display = "none";
+  }
 }
 
 function load() {
