@@ -838,98 +838,75 @@ canvas#spendingChart {
 }
 
 
-/* --- ULTIMATE 320px MOBILE COMPATIBILITY --- */
 @media (max-width: 600px) {
-    /* 1. Kill the month label space */
-    .month-label { 
-        display: none !important; 
-    }
-
-    /* 2. Force Header to 100% width with no padding leakage */
+    /* ─── HEADER ADJUSTMENTS ─── */
     header {
         padding: 0 10px !important;
-        height: 56px;
         width: 100% !important;
         box-sizing: border-box;
-        justify-content: space-between;
     }
 
+    /* Change Logout from circle back to rounded rectangle */
+    .logout-btn {
+        width: auto !important; /* Allow it to be wider than high */
+        height: 34px !important;
+        padding: 0 10px !important;
+        border-radius: 6px !important; /* Rectangular with slight round corners */
+        aspect-ratio: auto !important;
+    }
+
+    /* ─── LAYOUT REORDERING ─── */
+    /* This moves History BELOW the Add Transaction form */
+    .main-grid {
+        display: flex !important;
+        flex-direction: column !important; /* Stacks vertically */
+        width: 100% !important;
+        gap: 20px;
+    }
+
+    /* Force the Panel (Add Transaction) to be the first item */
+    .panel:nth-child(1) {
+        order: 1; /* Form stays top */
+    }
+
+    /* Force the History Panel to be second */
+    .history-panel {
+        order: 2; /* Moves History under the form */
+        width: 100% !important;
+    }
+
+    .chart-panel {
+        order: 3; /* Chart moves to bottom */
+    }
+
+    /* ─── 320px SQUISH FIXES ─── */
     .logo {
-        font-size: 16px !important; /* Smaller logo for 320px */
-        white-space: nowrap;
-        flex-shrink: 1;
-    }
-
-    /* 3. Collapse the Header Right section */
-    .header-right {
-        gap: 6px !important;
-        flex-shrink: 0;
+        font-size: 16px !important;
+        letter-spacing: -0.5px;
     }
 
     .user-chip {
-        padding: 4px !important; /* Circular avatar only */
         background: transparent !important;
         border: none !important;
-    }
-
-    .user-email { 
-        display: none !important; 
-    }
-
-    /* 4. Logout Button - Icon Only */
-    .logout-btn {
-        width: 36px;
-        height: 36px;
         padding: 0 !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
     }
 
-    .logout-btn span { 
-        display: none !important; 
-    }
-
-    /* 5. Force the App body to fit */
-    .app {
-        padding: 12px 10px !important;
-        width: 100% !important;
-        max-width: 100vw !important;
-        overflow-x: hidden;
-        box-sizing: border-box;
-    }
-
-    /* 6. Fix Summary Cards spacing */
     .summary-grid {
-        grid-template-columns: 1fr !important;
-        gap: 10px;
-        width: 100%;
+        grid-template-columns: 1fr !important; /* Single column for cards */
+        gap: 12px;
     }
 
     .card-amount {
-        font-size: 24px !important; /* Shrink font so long numbers don't break */
-    }
-
-    /* 7. Fix the Main Grid (The common culprit) */
-    .main-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-    }
-
-    .panel {
-        width: 100% !important;
-        margin-bottom: 16px;
+        font-size: 24px !important; /* Prevent long numbers from breaking width */
     }
 }
 
-/* 8. GLOBAL OVERFLOW PREVENTER (Add at the very bottom of CSS) */
+/* ─── GLOBAL FIX FOR HORIZONTAL SCROLL ─── */
 html, body {
-    width: 100% !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
     overflow-x: hidden !important;
-    position: relative;
+    margin: 0;
+    padding: 0;
 }
 
 * {
