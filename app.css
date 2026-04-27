@@ -838,79 +838,91 @@ canvas#spendingChart {
 }
 
 
+/* ─── ULTIMATE MOBILE & 320px FIX ─── */
 @media (max-width: 600px) {
-    /* ─── HEADER ADJUSTMENTS ─── */
-    header {
-        padding: 0 10px !important;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
+  /* 1. COMPLETELY REMOVE DATE FOR HEADER SPACE */
+  .month-label, #monthLabel {
+    display: none !important;
+  }
 
-    /* Change Logout from circle back to rounded rectangle */
-    .logout-btn {
-        width: auto !important; /* Allow it to be wider than high */
-        height: 34px !important;
-        padding: 0 10px !important;
-        border-radius: 6px !important; /* Rectangular with slight round corners */
-        aspect-ratio: auto !important;
-    }
+  /* 2. RECTANGULAR LOGOUT BUTTON */
+  .logout-btn {
+    padding: 6px 12px !important;
+    border-radius: 6px !important; /* Makes it a rectangle */
+    width: auto !important;
+    height: 34px !important;
+    font-size: 11px !important;
+    aspect-ratio: auto !important;
+  }
 
-    /* ─── LAYOUT REORDERING ─── */
-    /* This moves History BELOW the Add Transaction form */
-    .main-grid {
-        display: flex !important;
-        flex-direction: column !important; /* Stacks vertically */
-        width: 100% !important;
-        gap: 20px;
-    }
+  /* Hide logout text to ensure it fits on 320px */
+  .logout-btn span { 
+    display: none !important; 
+  }
 
-    /* Force the Panel (Add Transaction) to be the first item */
-    .panel:nth-child(1) {
-        order: 1; /* Form stays top */
-    }
+  /* 3. HEADER COMPACTNESS */
+  header {
+    padding: 0 10px !important;
+    height: 56px;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
 
-    /* Force the History Panel to be second */
-    .history-panel {
-        order: 2; /* Moves History under the form */
-        width: 100% !important;
-    }
+  .logo {
+    font-size: 16px !important;
+    flex-shrink: 1;
+  }
 
-    .chart-panel {
-        order: 3; /* Chart moves to bottom */
-    }
+  /* 4. MOVE ADD TRANSACTION ON TOP */
+  .main-grid {
+    display: flex !important;
+    flex-direction: column !important; /* Stack vertically */
+    gap: 16px !important;
+  }
 
-    /* ─── 320px SQUISH FIXES ─── */
-    .logo {
-        font-size: 16px !important;
-        letter-spacing: -0.5px;
-    }
+  /* This targets the "Add Transaction" panel specifically */
+  .panel:not(.history-panel):not(.chart-panel) {
+    order: 1 !important; /* Force to top */
+  }
 
-    .user-chip {
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-    }
+  /* This targets the Transaction List */
+  .history-panel {
+    order: 2 !important; /* Force below form */
+    margin-top: 0 !important;
+  }
 
-    .summary-grid {
-        grid-template-columns: 1fr !important; /* Single column for cards */
-        gap: 12px;
-    }
+  .chart-panel {
+    order: 3 !important; /* Chart at the very bottom */
+  }
 
-    .card-amount {
-        font-size: 24px !important; /* Prevent long numbers from breaking width */
-    }
+  /* 5. SUMMARY CARDS FIX */
+  .summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .user-email {
+    display: none !important;
+  }
+
+  .user-chip {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+  }
 }
 
-/* ─── GLOBAL FIX FOR HORIZONTAL SCROLL ─── */
+ /* Prevent horizontal overflow on the entire site */
 html, body {
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    margin: 0;
-    padding: 0;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  margin: 0;
+  padding: 0;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
 #balanceNote {
