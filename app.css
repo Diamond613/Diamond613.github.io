@@ -15,84 +15,55 @@
   --radius-sm: 10px;
 }
 
+/* --- OPTIMIZED LIGHT THEME --- */
 [data-theme="light"] {
-  /* Soft background to prevent eye strain */
-  --bg: #f8f7f2;      
-  --bg2: #efee e6;    
-  --bg3: #ffffff;     
-  
-  /* Deeper text for better readability */
-  --text: #1a1a1a;    
-  --muted: #5e5d6e;   
-  
-  /* Slightly darker accents so they don't "glow" too much */
-  --accent: #a5cc45;  /* Darker neon green */
+  --bg: #f3f4f6;       /* Soft grey background for laptop depth */
+  --bg2: #e5e7eb;      
+  --bg3: #ffffff;      /* Pure white for cards */
+  --text: #111827;     
+  --muted: #4b5563;    /* Darker muted text for laptop readability */
+  --accent: #84cc16;   
   --income-clr: #05a826; 
   --expense-clr: #d60d0d;
-  
-  /* Softer borders and shadows */
-  --border: rgba(0,0,0,0.06);
-  --card-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  --border: rgba(0, 0, 0, 0.1);
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
-/* Ensure input text is always visible */
+/* Light Mode Input Fixes */
 [data-theme="light"] input, 
 [data-theme="light"] select, 
 [data-theme="light"] textarea {
-  color: #1a1a1a !important;
+  color: #111827 !important;
   background-color: #ffffff !important;
-  border: 1px solid #ddd !important;
+  border: 1px solid #d1d5db !important;
 }
 
-/* Fix Button Text Contrast */
-[data-theme="light"] .submit-btn {
-  color: #000000 !important; /* Always black text on the green/red buttons in light mode */
-}
-
-[data-theme="light"] .submit-btn.expense-mode {
-  color: #ffffff !important; /* White text is better on Red */
-}
-
-/* Fix Chart Legend visibility */
-[data-theme="light"] .chart-legend {
-  color: #1a1a1a !important;
-}
-
-/* Card Elevation & Glass Effect */
-.summary-card, .panel, .budget-section {
-  background: var(--bg3) !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: var(--card-shadow) !important;
-  backdrop-filter: blur(8px);
-}
-
-/* Specific Light Mode adjustments for readability */
-[data-theme="light"] {
-  --bg: #fdfdfa; /* Slightly warmer than pure white */
-  --bg2: #f0efe8;
-  --bg3: #ffffff;
-  --text: #1a1a1a;
-  --muted: #555555; /* Darker text for readability */
-}
-
-/* Making inputs stand out in light mode */
-[data-theme="light"] .field input, 
-[data-theme="light"] .field select, 
-[data-theme="light"] .field textarea {
-  border: 1px solid #cccccc !important;
-  background: #ffffff !important;
-}
-
+/* Fix Labels & Subtext for Laptop Contrast */
 [data-theme="light"] .card-sub, 
 [data-theme="light"] .tx-desc, 
 [data-theme="light"] .month-label,
 [data-theme="light"] .field label {
-  color: #444444 !important; /* Darker than the default muted gray */
+  color: #374151 !important;
 }
 
-[data-theme="light"] .summary-card {
+/* Button Text Contrast */
+[data-theme="light"] #submitBtn {
+  color: #ffffff !important; /* White text on green/red background */
+}
+
+/* Summary Card specific fix for laptop */
+[data-theme="light"] .summary-card, 
+[data-theme="light"] .panel, 
+[data-theme="light"] .budget-section {
   background: #ffffff !important;
-  border: 1px solid #e0e0e0 !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+/* Header fix for laptop */
+[data-theme="light"] header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -683,6 +654,13 @@ header {
   display: flex; align-items: center; gap: 10px;
   animation: toastIn 0.25s ease, toastOut 0.25s ease 2.5s forwards;
   min-width: 220px;
+  border-left: 4px solid var(--accent);
+}
+
+/* If you want the warning toast to look different */
+.toast:contains("🚨"), .toast:contains("❌"), .toast:contains("🚫") {
+    border-left-color: var(--expense-clr);
+    background: #2a0a0a; /* Dark red tint for dark mode */
 }
 
 @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
@@ -859,27 +837,117 @@ canvas#spendingChart {
     max-height: 240px; /* Match your wrapper */
 }
 
-/* --- MODERN MOBILE UPDATE FOR APP.CSS --- */
-@media (max-width: 900px) {
-    .dashboard-container {
-        grid-template-columns: 1fr; /* Single column stack */
-        padding: 20px;
+
+/* --- ULTIMATE 320px MOBILE COMPATIBILITY --- */
+@media (max-width: 600px) {
+    /* 1. Kill the month label space */
+    .month-label { 
+        display: none !important; 
     }
 
-    .sidebar {
-        position: static; /* No longer floating on the side */
+    /* 2. Force Header to 100% width with no padding leakage */
+    header {
+        padding: 0 10px !important;
+        height: 56px;
+        width: 100% !important;
+        box-sizing: border-box;
+        justify-content: space-between;
+    }
+
+    .logo {
+        font-size: 16px !important; /* Smaller logo for 320px */
+        white-space: nowrap;
+        flex-shrink: 1;
+    }
+
+    /* 3. Collapse the Header Right section */
+    .header-right {
+        gap: 6px !important;
+        flex-shrink: 0;
+    }
+
+    .user-chip {
+        padding: 4px !important; /* Circular avatar only */
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .user-email { 
+        display: none !important; 
+    }
+
+    /* 4. Logout Button - Icon Only */
+    .logout-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .logout-btn span { 
+        display: none !important; 
+    }
+
+    /* 5. Force the App body to fit */
+    .app {
+        padding: 12px 10px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    /* 6. Fix Summary Cards spacing */
+    .summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
         width: 100%;
     }
 
-    .stats-grid {
-        grid-template-columns: 1fr; /* Big easy-to-read cards */
+    .card-amount {
+        font-size: 24px !important; /* Shrink font so long numbers don't break */
     }
 
-    .main-card {
-        padding: 24px;
+    /* 7. Fix the Main Grid (The common culprit) */
+    .main-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
     }
 
-    .chart-box {
-        height: 250px; /* Smaller height for mobile charts */
+    .panel {
+        width: 100% !important;
+        margin-bottom: 16px;
     }
+}
+
+/* 8. GLOBAL OVERFLOW PREVENTER (Add at the very bottom of CSS) */
+html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    position: relative;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#balanceNote {
+    transition: color 0.3s ease;
+    font-weight: 500;
+}
+
+/* Optional: Subtle animation for the warning state */
+.low-balance-warning {
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
 }

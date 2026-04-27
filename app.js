@@ -136,10 +136,19 @@ function init() {
   updateBudget();
   renderList();
 
-  // Attempt 1: Immediate
+  // --- NEW: 320px SAFETY CHECK ---
+  if (window.innerWidth <= 320) {
+    const userEmailEl = document.getElementById("userEmail");
+    if (userEmailEl) userEmailEl.style.display = "none";
+
+    // Optional: Force the logo to be smaller if it's still pushing the width
+    const logoEl = document.querySelector(".logo");
+    if (logoEl) logoEl.style.fontSize = "14px";
+  }
+  // -------------------------------
+
   updateChart();
 
-  // Attempt 2: Forced Delay (The "Safety Net")
   setTimeout(() => {
     if (!spendingChart) {
       console.log("Retrying chart render...");
@@ -199,6 +208,7 @@ function setType(type) {
     "type-btn" + (type === "expense" ? " active-expense" : "");
 }
 
+/* ─────────────── ADD TRANSACTION (WITH BUDGET BLOCK) ─────────────── */
 function submitTransaction() {
   const amtInput = document.getElementById("fAmount");
   const amount = parseComma(amtInput.value);
@@ -210,6 +220,35 @@ function submitTransaction() {
     showToast("⚠️ Enter valid amount");
     return;
   }
+
+  // --- NEW: BUDGET & BALANCE LOGIC ---
+  const totalIncome = state.transactions
+    .filter((t) => t.type === "income")
+    .reduce((s, t) => s + t.amount, 0);
+  const totalExpenses = state.transactions
+    .filter((t) => t.type === "expense")
+    .reduce((s, t) => s + t.amount, 0);
+  const currentBalance = totalIncome - totalExpenses;
+  const budgetLimit = state.budget.monthlyLimit;
+
+  if (state.activeType === "expense") {
+    // 1. Block if Expense exceeds total net balance
+    if (amount > currentBalance) {
+      showToast(
+        "❌ Insufficient Balance! You cannot spend more than you have.",
+      );
+      return;
+    }
+
+    // 2. Block if Budget Limit is reached
+    if (budgetLimit > 0 && totalExpenses + amount > budgetLimit) {
+      showToast(
+        "🚫 Budget Limit Reached! Increase your set budget to add this expense.",
+      );
+      return;
+    }
+  }
+  // ------------------------------------
 
   const tx = {
     id: Date.now().toString(),
@@ -223,6 +262,12 @@ function submitTransaction() {
 
   save();
   updateAll();
+  checkWarnings(
+    totalExpenses + (state.activeType === "expense" ? amount : 0),
+    budgetLimit,
+    currentBalance - (state.activeType === "expense" ? amount : 0),
+  );
+
   amtInput.value = "";
   document.getElementById("fNote").value = "";
   showToast(`✅ Added ${state.activeType}`);
@@ -309,12 +354,31 @@ function updateSummary() {
     .filter((t) => t.type === "expense")
     .reduce((s, t) => s + t.amount, 0);
   const bal = inc - exp;
+
   document.getElementById("totalIncome").textContent = fmt(inc);
   document.getElementById("totalExpenses").textContent = fmt(exp);
+
   const balEl = document.getElementById("balance");
+  const noteEl = document.getElementById("balanceNote"); // Targeting the note
+
   if (balEl) {
     balEl.textContent = fmt(bal);
     balEl.style.color = bal >= 0 ? "var(--accent)" : "var(--expense-clr)";
+  }
+
+  if (noteEl) {
+    const lowThreshold = inc * 0.1; // 10% of total income
+
+    if (bal <= 0) {
+      noteEl.textContent = "⚠️ Critical: Zero Balance!";
+      noteEl.style.color = "var(--expense-clr)";
+    } else if (bal < lowThreshold) {
+      noteEl.textContent = "📉 Warning: Running low on funds!";
+      noteEl.style.color = "#ffa94d";
+    } else {
+      noteEl.textContent = "Keep it up!";
+      noteEl.style.color = "var(--muted)";
+    }
   }
 }
 
@@ -447,27 +511,15 @@ function updateBudget() {
   const pctEl = document.getElementById("budgetPct");
 
   if (bar) {
-    // Set the width
     bar.style.width = Math.min(pct, 100) + "%";
-
-    // Remove old colors
     bar.classList.remove("normal", "warning", "danger");
 
-    // Apply new colors based on percentage
-    if (pct >= 90) {
-      bar.classList.add("danger"); // Red
-    } else if (pct >= 70) {
-      bar.classList.add("warning"); // Orange
-    } else {
-      bar.classList.add("normal"); // Green
-    }
+    if (pct >= 90) bar.classList.add("danger");
+    else if (pct >= 70) bar.classList.add("warning");
+    else bar.classList.add("normal");
   }
 
-  // Update the percentage text (e.g., "75%")
-  if (pctEl) {
-    pctEl.textContent = Math.round(pct) + "%";
-  }
-
+  if (pctEl) pctEl.textContent = Math.round(pct) + "%";
   document.getElementById("budgetSpent").textContent = fmt(spent) + " spent";
   document.getElementById("budgetLimit").textContent = fmt(limit) + " budget";
 }
@@ -553,4 +605,22 @@ function saveBudget() {
   updateBudget();
   closeModal();
   showToast("✅ Budget updated");
+}
+
+/* ─────────────── WARNING SYSTEM ─────────────── */
+function checkWarnings(spent, limit, balance) {
+  if (limit > 0) {
+    const usage = (spent / limit) * 100;
+
+    if (usage >= 100) {
+      showToast("🚨 ALERT: You have hit 100% of your budget limit!");
+    } else if (usage >= 70) {
+      showToast("⚠️ Warning: You've used over 70% of your budget.");
+    }
+  }
+
+  // Net Balance Warning (if balance drops below ₦5,000 or 10% of income)
+  if (balance > 0 && balance < 5000) {
+    showToast("📉 Low Balance: Your net balance is almost empty!");
+  }
 }
