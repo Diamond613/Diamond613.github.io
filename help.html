@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center | StarTech</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=DM+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="help.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-link">← RETURN TO DASHBOARD</a>
+
+        <header>
+            <h1>How can we help?</h1>
+            <p>Search for features or browse the guides below.</p>
+        </header>
+
+        <div class="search-wrapper">
+            <input type="text" id="helpSearch" class="search-bar" placeholder="Try searching 'budget' or 'income'...">
+        </div>
+
+        <div id="guideContainer">
+            <div class="guide-section" data-keywords="dashboard balance summary income expense total">
+                <h2><span>01</span> Dashboard Overview</h2>
+                <p>The main screen gives you a high-level view of your wealth. Each card updates automatically when you
+                    add data.</p>
+                <ul>
+                    <li><b>Total Income:</b> Sum of all green-labeled transactions.</li>
+                    <li><b>Total Expenses:</b> Sum of all red-labeled transactions.</li>
+                    <li><b>Net Balance:</b> Your actual take-home money.</li>
+                </ul>
+            </div>
+
+            <div class="guide-section" data-keywords="add transaction category amount date note">
+                <h2><span>02</span> Logging Transactions</h2>
+                <p>To record a new entry, use the side panel on your app page:</p>
+                <ol>
+                    <li>Choose <b>Type</b> (Income or Expense).</li>
+                    <li>Select a <b>Category</b> from the dropdown.</li>
+                    <li>Type the <b>Amount</b> (we handle the currency formatting).</li>
+                    <li>Click <b>Add</b> to save it to your history.</li>
+                </ol>
+            </div>
+
+            <div class="guide-section" data-keywords="budget limit bar monthly warning goal">
+                <h2><span>03</span> Setting Budgets</h2>
+                <p>Stay disciplined by setting a monthly spending cap.</p>
+                <div class="ui-tip">Click the <b>"Set Budget"</b> button to enter your limit. The bar will change color
+                    from <b>Green</b> to <b>Red</b> as you spend more.</div>
+            </div>
+
+            <div class="guide-section" data-keywords="history chart filter delete trash category">
+                <h2><span>04</span> History & Charts</h2>
+                <p>Review your past spending patterns with visual tools.</p>
+                <ul>
+                    <li><b>Doughnut Chart:</b> Hover over segments to see which category eats most of your budget.</li>
+                    <li><b>Filter Chips:</b> Click a category name to hide everything else.</li>
+                    <li><b>Delete:</b> Use the 🗑️ icon to remove a mistake.</li>
+                    <li><b>Edit:</b> use the ✏️ icon to edit a mistake.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="noResults" class="no-results">
+            <p>No guides found matching that search. Try another keyword!</p>
+        </div>
+    </div>
+
+    <script src="help.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+# ============================================================
+#  StarTech .gitignore — protects secrets from GitHub
+# ============================================================
+
+# Environment variables (NEVER commit this)
+.env
+.env.local
+.env.production
+.env.staging
+
+# Firebase local emulator data
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Node / package manager
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+
+# Build output
+dist/
+build/

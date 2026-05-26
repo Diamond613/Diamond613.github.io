@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StarTech | Personal Finance</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+  <nav>
+    <div class="logo">✨ Star<span>Tech</span></div>
+    <div class="nav-right">
+      <a href="about.html" class="nav-link">About Us</a>
+      <button class="login-btn" onclick="openModal('login')">Login</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">🚀 Smart Finance for Everyone</div>
+    <h1>Monitor your <span class="time">MONEY</span><br /><span class="gradient-text">without stress.</span></h1>
+    <p>Join thousands of users tracking expenses and growing wealth with the smartest budget app.</p>
+    <button class="cta-btn" onclick="openModal('register')">Get Started Free →</button>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">10k+</span><span class="stat-label">Users</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">₦2B+</span><span class="stat-label">Tracked</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">99%</span><span class="stat-label">Satisfaction</span></div>
+    </div>
+  </section>
+
+  <a href="help.html" class="help-btn" title="Help">
+    <span class="dot"></span>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  </a>
+
+  <section class="features">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Visual Insights</h3>
+        <p>Beautiful charts that make understanding your spending effortless.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Budget Goals</h3>
+        <p>Set monthly budgets and get alerts before you overspend.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Instant Tracking</h3>
+        <p>Log income and expenses in seconds with smart categories.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="main-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">✨ Star<span>Tech</span></div>
+        <p>The smartest way to manage your personal finances.</p>
+        <div class="social-links">
+          <a href="#" aria-label="Twitter">𝕏</a>
+          <a href="#" aria-label="Instagram">📸</a>
+          <a href="#" aria-label="LinkedIn">💼</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Product</h4><a href="#">Features</a><a href="#">Budgeting</a><a href="#">Security</a>
+      </div>
+      <div class="footer-links">
+        <h4>Company</h4><a href="about.html">About Us</a><a href="help.html">Help</a><a href="#">Support</a>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Cookie Settings</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="copyright">&copy; 2026 StarTech Finance. All rights reserved.</div>
+      <div class="status-indicator"><span class="status-dot"></span>Systems Operational</div>
+    </div>
+  </footer>
+
+  <!-- ══ AUTH MODAL ══ -->
+  <div class="modal-overlay" id="authModal" onclick="handleOverlayClick(event)">
+    <div class="auth-card">
+      <button class="auth-close" onclick="closeModal()">✕</button>
+      <div class="auth-logo">✨ Star<span>Tech</span></div>
+      <div class="auth-tagline">Personal Finance Dashboard</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Login</button>
+        <button class="auth-tab" id="tabRegister" onclick="showTab('register')">Create Account</button>
+      </div>
+      <div class="auth-msg" id="authMsg"></div>
+
+      <!-- LOGIN -->
+      <div id="loginForm">
+        <div class="auth-form">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="loginId" placeholder="you@example.com" autocomplete="username"
+              autocapitalize="none" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password" />
+              <button type="button" class="pw-toggle" onclick="togglePw('loginPw', this)">👁️</button>
+            </div>
+          </div>
+          <div style="text-align:right;margin-top:-6px;">
+            <button type="button" class="forgot-link" onclick="showForgot()">Forgot password?</button>
+          </div>
+          <button class="auth-submit" onclick="doLogin()">Login →</button>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="registerForm" style="display:none">
+        <div class="auth-form">
+          <div class="name-row">
+            <div class="field"><label>First Name</label><input type="text" id="regFirst" placeholder="John"
+                autocapitalize="words" /></div>
+            <div class="field"><label>Last Name</label><input type="text" id="regLast" placeholder="Doe"
+                autocapitalize="words" /></div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email"
+              autocapitalize="none" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="regPw" placeholder="Choose a strong password" autocomplete="new-password"
+                oninput="checkStrength(this.value)" />
+              <button type="button" class="pw-toggle" onclick="togglePw('regPw', this)">👁️</button>
+            </div>
+            <div class="pw-strength">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="regPw2" placeholder="Repeat your password" autocomplete="new-password" />
+              <button type="button" class="pw-toggle" onclick="togglePw('regPw2', this)">👁️</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Security Question</label>
+            <select id="regSecQ">
+              <option>What was the name of your first pet?</option>
+              <option>What is your mother's maiden name?</option>
+              <option>What city were you born in?</option>
+              <option>What was the name of your primary school?</option>
+              <option>What is your oldest sibling's middle name?</option>
+              <option>What was the make of your first car?</option>
+              <option>What street did you grow up on?</option>
+              <option>What was your childhood nickname?</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Your Answer</label>
+            <input type="text" id="regSecA" placeholder="Used to help recover your account" autocapitalize="none" />
+          </div>
+          <button class="auth-submit" onclick="doRegister()">Create Account →</button>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD (Firebase sends email — simple 1-step) -->
+      <div id="forgotForm" style="display:none">
+        <div class="forgot-header">
+          <button type="button" class="forgot-back" onclick="showTab('login')">← Back to Login</button>
+          <p class="forgot-title">Reset Password</p>
+        </div>
+        <div class="auth-form">
+          <p class="forgot-hint">Enter your email and we'll send you a reset link straight away.</p>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="fpEmail" placeholder="you@example.com" autocapitalize="none" />
+          </div>
+          <button class="auth-submit" onclick="sendPasswordReset()">Send Reset Email →</button>
+        </div>
+      </div>
+
+      <div class="auth-footer">&copy; 2026 StarTech &nbsp;·&nbsp; Secured by Firebase</div>
+    </div>
+  </div>
+
+  <!-- ⚠️ USE type="module" so ES module imports work -->
+  <script type="module" src="firebase_auth.js"></script>
+</body>
+
+</html>
