@@ -1,25 +1,13 @@
 /* ============================================================
-   StarTech — app.js  (Firebase + Dashboard — fully merged)
-   ============================================================
-   HOW THIS FILE WORKS:
-   1. Firebase checks if you are logged in.
-   2. If NOT logged in → sends you back to index.html immediately.
-   3. If logged in → loads your data from Firestore, then starts the app.
-   4. Every time you add/edit/delete a transaction, it saves to Firestore.
-   5. doLogout() signs you out of Firebase and sends you to index.html.
+   StarTech — app.js  (Firebase + Dashboard)
    ============================================================ */
 
-/* ── Step 1: Import Firebase tools ── */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* ── Step 2: Your Firebase project config ──
-   Get these values from:
-   Firebase Console → Project Settings → Your apps → SDK setup
-   Replace every "YOUR_..." with your real values.             */
 const firebaseConfig = {
   apiKey: "AIzaSyCsBGJKHzfLm1qleOzjXTI7RiBv8jzNfss",
   authDomain: "startech-finance.firebaseapp.com",
@@ -30,45 +18,28 @@ const firebaseConfig = {
   measurementId: "G-VX1SCML9N1"
 };
 
-/* ── Step 3: Start Firebase ── */
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
-/* This holds the currently logged-in Firebase user */
 let currentFirebaseUser = null;
 
 /* ============================================================
    AUTH GUARD
-   Firebase automatically checks if someone is logged in.
-   - Not logged in  → redirect to index.html (login page)
-   - Logged in      → load their Firestore data, then start app
    ============================================================ */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    /* Nobody is logged in — go back to login page */
     window.location.replace("index.html");
     return;
   }
-
-  /* User IS logged in */
   currentFirebaseUser = user;
-
-  /* Save their display name so the header chip can show it */
   localStorage.setItem("startech_user", user.displayName || user.email);
-
-  /* Load this user's transactions and settings from Firestore */
   await loadFromFirestore(user.uid);
-
-  /* Now start the dashboard */
   init();
 });
 
 /* ============================================================
-   FIRESTORE — LOAD USER DATA
-   Reads the user's document from the "userData" collection.
-   If the user is brand new, the document won't exist yet —
-   that's fine, they just start with an empty state.
+   FIRESTORE — LOAD
    ============================================================ */
 async function loadFromFirestore(uid) {
   try {
@@ -79,17 +50,13 @@ async function loadFromFirestore(uid) {
       state.budget = data.budget || { monthlyLimit: 0 };
       state.theme = data.theme || "dark";
     }
-    /* If no document exists yet, state keeps its default empty values */
   } catch (err) {
     console.error("Could not load data from Firestore:", err);
-    /* App still works — user just starts with empty data */
   }
 }
 
 /* ============================================================
-   FIRESTORE — SAVE USER DATA
-   Writes the entire state to Firestore every time something
-   changes (add, edit, delete transaction, change budget, etc.)
+   FIRESTORE — SAVE
    ============================================================ */
 async function saveToFirestore() {
   if (!currentFirebaseUser) return;
@@ -101,28 +68,21 @@ async function saveToFirestore() {
     });
   } catch (err) {
     console.error("Could not save to Firestore:", err);
-    showToast("⚠️ Could not sync to cloud. Check your connection.");
+    showToast("Could not sync to cloud. Check your connection.", "warning");
   }
 }
 
 /* ============================================================
    LOGOUT
-   Signs the user out of Firebase, clears local storage,
-   and sends them back to the login page.
    ============================================================ */
 window.doLogout = async function () {
-  try {
-    await signOut(auth);
-  } catch (err) {
-    console.error("Logout error:", err);
-  }
+  try { await signOut(auth); } catch (err) { console.error("Logout error:", err); }
   localStorage.removeItem("startech_user");
   window.location.replace("index.html");
 };
 
 /* ============================================================
    GLOBAL STATE
-   All your app data lives here while the page is open.
    ============================================================ */
 let state = {
   transactions: [],
@@ -156,13 +116,10 @@ const CAT_COLORS = [
 /* ============================================================
    UTILITIES
    ============================================================ */
-
-/* Format a number as ₦1,234.56 */
 function fmt(n) {
   return "₦" + Number(n).toLocaleString("en-NG", { minimumFractionDigits: 2 });
 }
 
-/* Format an input field value with commas while typing */
 function formatComma(val) {
   let clean = String(val).replace(/[^0-9.]/g, "");
   const dotIndex = clean.indexOf(".");
@@ -175,44 +132,202 @@ function formatComma(val) {
   return parts.length > 1 ? parts[0] + "." + parts[1] : parts[0];
 }
 
-/* Parse a comma-formatted string back to a number */
 function parseComma(val) {
   return parseFloat(String(val).replace(/,/g, "")) || 0;
 }
 
-/* ============================================================
-   DATE HELPERS
-   ============================================================ */
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-/* A transaction is "active" (counted in totals) if its date is today or in the past */
 function isActive(tx) {
   return tx.date <= todayStr();
 }
 
 /* ============================================================
-   SAVE  (replaces old localStorage-only save)
-   Saves to BOTH localStorage (for instant UI) AND Firestore (cloud sync).
+   SAVE
    ============================================================ */
 function save() {
-  /* Keep a local copy so the UI never feels slow */
   if (currentFirebaseUser) {
     const uid = currentFirebaseUser.uid;
     localStorage.setItem("ft_tx_" + uid, JSON.stringify(state.transactions));
     localStorage.setItem("ft_budget_" + uid, JSON.stringify(state.budget));
     localStorage.setItem("ft_theme_" + uid, state.theme);
   }
-  /* Sync to Firestore in the background (non-blocking) */
   saveToFirestore();
 }
 
 /* ============================================================
-   APP INIT — called after Firestore data is loaded
+   INJECT MODERN WARNING STYLES
+   ============================================================ */
+function injectWarningStyles() {
+  if (document.getElementById("startech-warning-styles")) return;
+  const style = document.createElement("style");
+  style.id = "startech-warning-styles";
+  style.textContent = `
+    /* Toast upgrades */
+    .toast {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      border-radius: 14px !important;
+      padding: 13px 18px !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2) !important;
+      backdrop-filter: blur(12px) !important;
+      border-left-width: 4px !important;
+    }
+    .toast.toast-success { border-left-color: #06ce2e !important; }
+    .toast.toast-warning { border-left-color: #ffa94d !important; }
+    .toast.toast-danger  { border-left-color: #fa1010 !important; }
+    .toast.toast-info    { border-left-color: #6bc8ff !important; }
+    .toast-icon { font-size: 18px; flex-shrink: 0; line-height: 1; }
+    .toast-text { flex: 1; line-height: 1.4; }
+
+    /* No-income warning banner */
+    #noIncomeBanner {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(255,169,77,0.12), rgba(255,169,77,0.05));
+      border: 1px solid rgba(255,169,77,0.35);
+      border-left: 4px solid #ffa94d;
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      animation: bannerSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #noIncomeBanner .nb-icon { font-size: 24px; flex-shrink: 0; margin-top: 1px; }
+    #noIncomeBanner .nb-body { flex: 1; }
+    #noIncomeBanner .nb-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #ffa94d;
+      margin-bottom: 4px;
+    }
+    #noIncomeBanner .nb-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    #noIncomeBanner .nb-add-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 7px 16px;
+      background: rgba(255,169,77,0.15);
+      border: 1px solid rgba(255,169,77,0.4);
+      border-radius: 8px;
+      color: #ffa94d;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, transform 0.15s;
+    }
+    #noIncomeBanner .nb-add-btn:hover {
+      background: rgba(255,169,77,0.28);
+      transform: translateY(-1px);
+    }
+    #noIncomeBanner .nb-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: color 0.2s, background 0.2s;
+    }
+    #noIncomeBanner .nb-close:hover { color: var(--text); background: var(--bg2); }
+
+    /* Balance banner upgrades */
+    .balance-banner {
+      border-left-width: 4px !important;
+      border-radius: 14px !important;
+      animation: bannerSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .balance-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 60%, rgba(255,255,255,0.025));
+      pointer-events: none;
+    }
+    .balance-banner.warning { border-left-color: #ffa94d !important; }
+    .balance-banner.danger  { border-left-color: #fa1010 !important; }
+
+    /* Balance empty modal glow */
+    #balanceEmptyModal .modal {
+      position: relative;
+      overflow: hidden;
+    }
+    #balanceEmptyModal .modal::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 240px; height: 240px;
+      background: radial-gradient(circle, rgba(250,16,16,0.1), transparent 70%);
+      pointer-events: none;
+    }
+    .modal-alert-icon {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      animation: iconBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both,
+                 iconPulse 2.5s ease-in-out 0.5s infinite !important;
+    }
+    @keyframes iconBounce {
+      from { transform: scale(0.4); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50%      { transform: scale(1.07) rotate(-3deg); }
+    }
+
+    /* Budget bar pulse when danger */
+    .budget-bar-fill.danger {
+      animation: budgetPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes budgetPulse {
+      0%, 100% { opacity: 1; box-shadow: none; }
+      50% { opacity: 0.75; box-shadow: 0 0 12px rgba(250,16,16,0.4); }
+    }
+
+    /* Shared slide-in */
+    @keyframes bannerSlideIn {
+      from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Button shake on validation error */
+    @keyframes btnShake {
+      0%, 100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      40%      { transform: translateX(7px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .btn-shake { animation: btnShake 0.4s ease !important; }
+  `;
+  document.head.appendChild(style);
+}
+
+/* ============================================================
+   APP INIT
    ============================================================ */
 function init() {
+  injectWarningStyles();
   applyTheme();
   setTodayDate();
   setType(state.activeType);
@@ -228,7 +343,7 @@ function init() {
 }
 
 /* ============================================================
-   AMOUNT INPUT — live comma formatting
+   AMOUNT INPUT
    ============================================================ */
 function attachAmountListeners() {
   ["fAmount", "budgetInput", "eAmount"].forEach(id => {
@@ -279,10 +394,23 @@ function attachButtonListeners() {
 }
 
 /* ============================================================
-   TYPE SWITCHER (Income / Expense)
+   TYPE SWITCHER — warns on expense if no income recorded
    ============================================================ */
 function setType(type) {
   state.activeType = type;
+
+  if (type === "expense") {
+    const totalIncome = state.transactions
+      .filter(t => t.type === "income" && isActive(t))
+      .reduce((s, t) => s + t.amount, 0);
+    if (totalIncome === 0) {
+      showNoIncomeBanner();
+    } else {
+      hideNoIncomeBanner();
+    }
+  } else {
+    hideNoIncomeBanner();
+  }
 
   const sel = document.getElementById("fCategory");
   if (sel) {
@@ -304,6 +432,45 @@ function setType(type) {
 }
 
 /* ============================================================
+   NO-INCOME BANNER
+   ============================================================ */
+function showNoIncomeBanner() {
+  if (document.getElementById("noIncomeBanner")) return;
+  const banner = document.createElement("div");
+  banner.id = "noIncomeBanner";
+  banner.innerHTML = `
+    <span class="nb-icon">⚠️</span>
+    <div class="nb-body">
+      <div class="nb-title">No Income Recorded Yet</div>
+      <div class="nb-text">
+        You have no income added. Record your income first so your balance
+        stays accurate and expenses are tracked correctly.
+      </div>
+      <button class="nb-add-btn" id="noIncomeAddBtn">+ Add Income First</button>
+    </div>
+    <button class="nb-close" id="noIncomeDismiss" title="Dismiss">✕</button>
+  `;
+  const grid = document.querySelector(".main-grid");
+  grid?.parentNode?.insertBefore(banner, grid);
+
+  document.getElementById("noIncomeAddBtn")?.addEventListener("click", () => {
+    hideNoIncomeBanner();
+    setType("income");
+    document.getElementById("fAmount")?.focus();
+  });
+  document.getElementById("noIncomeDismiss")?.addEventListener("click", hideNoIncomeBanner);
+}
+
+function hideNoIncomeBanner() {
+  const b = document.getElementById("noIncomeBanner");
+  if (!b) return;
+  b.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+  b.style.opacity = "0";
+  b.style.transform = "translateY(-10px)";
+  setTimeout(() => b.remove(), 270);
+}
+
+/* ============================================================
    ADD TRANSACTION
    ============================================================ */
 function submitTransaction() {
@@ -313,24 +480,47 @@ function submitTransaction() {
   const date = document.getElementById("fDate").value;
   const note = document.getElementById("fNote").value.trim();
 
-  if (!amount || amount <= 0) { showToast("⚠️ Enter a valid amount"); return; }
-  if (!date) { showToast("⚠️ Please pick a date"); return; }
+  if (!amount || amount <= 0) {
+    shakeBtn("submitBtn");
+    showToast("Enter a valid amount", "warning");
+    return;
+  }
+  if (!date) {
+    shakeBtn("submitBtn");
+    showToast("Please pick a date", "warning");
+    return;
+  }
 
-  /* Budget guard — only for active (today or past) expenses */
-  if (state.activeType === "expense" && date <= todayStr()) {
-    const limit = state.budget.monthlyLimit;
-    if (limit > 0) {
-      const spent = state.transactions
-        .filter(t => t.type === "expense" && isActive(t))
-        .reduce((s, t) => s + t.amount, 0);
-      const newSpent = spent + amount;
-      const pct = (newSpent / limit) * 100;
-      if (pct > 100) {
-        showToast("🚫 Budget exceeded! Increase your budget first.");
-        return;
+  /* Block expense submission if no income exists */
+  if (state.activeType === "expense") {
+    const totalIncome = state.transactions
+      .filter(t => t.type === "income" && isActive(t))
+      .reduce((s, t) => s + t.amount, 0);
+
+    if (totalIncome === 0) {
+      shakeBtn("submitBtn");
+      showToast("Add some income before recording expenses", "danger");
+      showNoIncomeBanner();
+      return;
+    }
+
+    /* Budget guard */
+    if (date <= todayStr()) {
+      const limit = state.budget.monthlyLimit;
+      if (limit > 0) {
+        const spent = state.transactions
+          .filter(t => t.type === "expense" && isActive(t))
+          .reduce((s, t) => s + t.amount, 0);
+        const newSpent = spent + amount;
+        const pct = (newSpent / limit) * 100;
+        if (pct > 100) {
+          shakeBtn("submitBtn");
+          showToast("Budget exceeded! Increase your budget first.", "danger");
+          return;
+        }
+        if (pct >= 90) showToast(`This takes you to ${Math.round(pct)}% of your budget!`, "danger");
+        else if (pct >= 70) showToast(`You've used ${Math.round(pct)}% of your budget.`, "warning");
       }
-      if (pct >= 90) showToast("🔴 Warning: This takes you to " + Math.round(pct) + "% of your budget!");
-      else if (pct >= 70) showToast("🟡 Heads-up: You've used " + Math.round(pct) + "% of your budget.");
     }
   }
 
@@ -345,10 +535,24 @@ function submitTransaction() {
 
   save();
   updateAll();
-  showToast(`✅ ${state.activeType === "income" ? "Income" : "Expense"} added!`);
+  showToast(`${state.activeType === "income" ? "Income" : "Expense"} added successfully!`, "success");
   amtInput.value = "";
   document.getElementById("fNote").value = "";
   setTodayDate();
+
+  if (state.activeType === "income") hideNoIncomeBanner();
+}
+
+/* ============================================================
+   SHAKE BUTTON HELPER
+   ============================================================ */
+function shakeBtn(id) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.remove("btn-shake");
+  void btn.offsetWidth;
+  btn.classList.add("btn-shake");
+  setTimeout(() => btn.classList.remove("btn-shake"), 500);
 }
 
 /* ============================================================
@@ -378,21 +582,19 @@ window.saveEdit = function () {
   const date = document.getElementById("eDate").value;
   const note = document.getElementById("eNote").value.trim();
 
-  if (!amount || amount <= 0) { showToast("⚠️ Enter a valid amount"); return; }
+  if (!amount || amount <= 0) { showToast("Enter a valid amount", "warning"); return; }
 
   const i = state.transactions.findIndex(t => t.id === state.editId);
   if (i !== -1) {
     state.transactions[i] = {
       ...state.transactions[i],
-      category,
-      amount,
-      date,
+      category, amount, date,
       description: note || category
     };
     save();
     updateAll();
     closeModal();
-    showToast("✅ Transaction updated");
+    showToast("Transaction updated", "success");
     state.editId = null;
   }
 };
@@ -407,12 +609,12 @@ window.deleteTx = function (id) {
     save();
     updateAll();
     closeModal();
-    showToast("🗑️ Transaction removed");
+    showToast("Transaction removed", "info");
   };
 };
 
 /* ============================================================
-   UPDATE ALL (called after any data change)
+   UPDATE ALL
    ============================================================ */
 function updateAll() {
   updateSummary();
@@ -423,6 +625,7 @@ function updateAll() {
 
 /* ============================================================
    SUMMARY CARDS + BALANCE WARNINGS
+   All warnings show every time — no session lock
    ============================================================ */
 function updateSummary() {
   const activeTx = state.transactions.filter(isActive);
@@ -453,9 +656,9 @@ function updateSummary() {
     else { noteEl.textContent = "Break even"; noteEl.style.color = "var(--muted)"; }
   }
 
-  /* Spending warnings */
+  /* Warnings — no sessionStorage gate, fires every time */
   if (inc > 0) {
-    const usedPct = (exp / inc) * 100;
+    const usedPct = exp > 0 ? (exp / inc) * 100 : 0;
     if (bal <= 0 && exp > 0) {
       hideBalanceBanner();
       openBalanceModal();
@@ -469,7 +672,9 @@ function updateSummary() {
   }
 }
 
-/* 70–99% spending banner */
+/* ============================================================
+   BALANCE BANNER (70%+ spending of income)
+   ============================================================ */
 function showBalanceBanner(pct) {
   let b = document.getElementById("balanceBanner");
   if (!b) {
@@ -484,20 +689,27 @@ function showBalanceBanner(pct) {
     <span class="bb-icon">${danger ? "🔴" : "🟡"}</span>
     <div class="bb-text">
       ${danger
-      ? `<strong>Almost out of money!</strong> You've spent <strong>${Math.round(pct)}%</strong> of your total income.`
-      : `<strong>Spending alert:</strong> You've used <strong>${Math.round(pct)}%</strong> of your income.`}
+      ? `<strong>Almost out of money!</strong> You've spent <strong>${Math.round(pct)}%</strong> of your total income. Consider cutting back.`
+      : `<strong>Spending alert:</strong> You've used <strong>${Math.round(pct)}%</strong> of your income. Watch your spending.`
+    }
     </div>
     <button class="bb-close" onclick="hideBalanceBanner()" title="Dismiss">✕</button>`;
 }
 
 window.hideBalanceBanner = function () {
-  document.getElementById("balanceBanner")?.remove();
+  const b = document.getElementById("balanceBanner");
+  if (!b) return;
+  b.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+  b.style.opacity = "0";
+  b.style.transform = "translateY(-10px)";
+  setTimeout(() => b.remove(), 270);
 };
 
-/* 100% balance popup */
+/* ============================================================
+   BALANCE EMPTY MODAL — fires every time balance hits zero
+   (sessionStorage.getItem lock removed entirely)
+   ============================================================ */
 function openBalanceModal() {
-  if (sessionStorage.getItem("balModalShown")) return;
-  sessionStorage.setItem("balModalShown", "1");
   document.getElementById("balanceEmptyModal")?.classList.add("open");
 }
 
@@ -527,13 +739,12 @@ function updateBudget() {
 
 window.saveBudget = function () {
   const amount = parseComma(document.getElementById("budgetInput").value);
-  if (!amount || amount <= 0) { showToast("⚠️ Enter a valid budget amount"); return; }
+  if (!amount || amount <= 0) { showToast("Enter a valid budget amount", "warning"); return; }
   state.budget.monthlyLimit = amount;
   save();
   updateBudget();
   closeModal();
-  showToast("✅ Budget set to " + fmt(amount));
-  sessionStorage.removeItem("balModalShown");
+  showToast("Budget set to " + fmt(amount), "success");
   updateSummary();
 };
 
@@ -625,11 +836,12 @@ function updateChart() {
         backgroundColor: CAT_COLORS,
         borderWidth: 2,
         borderColor: dk ? "#1a1a24" : "#ffffff",
-        hoverOffset: 8
+        hoverOffset: 10
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false, cutout: "62%",
+      responsive: true, maintainAspectRatio: false, cutout: "65%",
+      animation: { animateRotate: true, duration: 700, easing: "easeInOutQuart" },
       plugins: {
         legend: {
           position: "right",
@@ -651,7 +863,7 @@ function updateChart() {
           titleColor: dk ? "#f0eee8" : "#111827",
           bodyColor: dk ? "#c0bfcf" : "#374151",
           borderColor: dk ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)",
-          borderWidth: 1,
+          borderWidth: 1, padding: 12, cornerRadius: 10,
           callbacks: { label: ctx => ` ${fmt(ctx.parsed)}` }
         }
       }
@@ -684,19 +896,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ============================================================
-   TOAST NOTIFICATIONS
+   TOAST — typed with icon, auto-strips emoji prefixes
    ============================================================ */
-function showToast(msg) {
+function showToast(msg, type = "info") {
   const c = document.getElementById("toastContainer");
   if (!c) return;
+  const icons = { success: "✅", warning: "⚠️", danger: "🚫", info: "ℹ️" };
   const t = document.createElement("div");
-  t.className = "toast";
-  t.textContent = msg;
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `
+    <span class="toast-icon">${icons[type] || "ℹ️"}</span>
+    <span class="toast-text">${msg}</span>
+  `;
   c.appendChild(t);
   setTimeout(() => {
     t.style.animation = "toastOut 0.3s ease forwards";
     setTimeout(() => t.remove(), 300);
-  }, 2500);
+  }, 3000);
 }
 
 /* ============================================================
@@ -740,14 +956,10 @@ function setMonthLabel() {
 function setUserChip() {
   const user = currentFirebaseUser;
   if (!user) return;
-
-  /* Use Firebase display name if available, otherwise use email */
   const displayName = user.displayName || user.email || "User";
   const firstName = displayName.split(" ")[0];
-
   const av = document.getElementById("userAvatar");
   if (av) av.textContent = firstName.charAt(0).toUpperCase();
-
   const em = document.getElementById("userEmail");
   if (em) em.textContent = firstName;
 }
